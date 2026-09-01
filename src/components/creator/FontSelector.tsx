@@ -3,8 +3,6 @@
 import { useMemo, useState } from "react";
 import { FONT_CATEGORIES } from "@/types";
 import { FONT_CLASS } from "@/lib/fonts";
-import { FontCard } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
 type Font = {
@@ -12,6 +10,8 @@ type Font = {
   name: string;
   category: string;
 };
+
+const CATEGORIES = [{ id: "all", name: "All" }, ...FONT_CATEGORIES];
 
 export function FontSelector({
   fonts,
@@ -24,40 +24,25 @@ export function FontSelector({
   sample: string;
   onSelect: (id: string) => void;
 }) {
-  const [query, setQuery] = useState("");
-  const [category, setCategory] = useState("popular");
-  const preview = (sample.trim() || "GUILI").slice(0, 12);
+  const [category, setCategory] = useState("all");
+  const glyph = (sample.trim() || "A").slice(0, 2);
 
   const visible = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    return fonts.filter((font) => {
-      const matchesQuery = !q || font.name.toLowerCase().includes(q) || font.id.includes(q);
-      const matchesCat = q ? true : font.category === category;
-      return matchesQuery && matchesCat;
-    });
-  }, [fonts, query, category]);
+    if (category === "all") return fonts;
+    return fonts.filter((font) => font.category === category);
+  }, [fonts, category]);
 
   return (
-    <div className="space-y-3">
-      <Input
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-        placeholder="Search styles"
-        aria-label="Search fonts"
-        className="h-11"
-      />
-      <div className="flex gap-1 overflow-x-auto pb-1">
-        {FONT_CATEGORIES.map((cat) => (
+    <div className="space-y-2">
+      <div className="flex gap-0.5 overflow-x-auto pb-0.5">
+        {CATEGORIES.map((cat) => (
           <button
             key={cat.id}
             type="button"
-            onClick={() => {
-              setCategory(cat.id);
-              setQuery("");
-            }}
+            onClick={() => setCategory(cat.id)}
             className={cn(
-              "rounded-full px-3 py-1.5 text-[12px] font-medium whitespace-nowrap transition",
-              category === cat.id && !query
+              "rounded-full px-2 py-1 text-[11px] font-medium whitespace-nowrap transition",
+              category === cat.id
                 ? "bg-foreground text-white"
                 : "text-muted hover:bg-background hover:text-foreground",
             )}
@@ -66,27 +51,28 @@ export function FontSelector({
           </button>
         ))}
       </div>
-      <div className="grid grid-cols-1 gap-2.5">
+      <div className="grid grid-cols-3 gap-1.5">
         {visible.map((font) => (
-          <FontCard
+          <button
             key={font.id}
-            selected={font.id === selectedId}
+            type="button"
+            title={font.name}
             onClick={() => onSelect(font.id)}
             aria-pressed={font.id === selectedId}
+            className={cn(
+              "flex h-11 items-center justify-center rounded-[10px] border transition",
+              font.id === selectedId
+                ? "border-foreground/30 bg-background shadow-[0_0_0_1px_rgba(34,34,34,0.08)]"
+                : "border-border bg-surface hover:border-border-strong",
+            )}
           >
-            <p
-              className={cn(
-                "truncate text-[26px] leading-none tracking-tight text-foreground",
-                FONT_CLASS[font.id],
-              )}
-            >
-              {preview}
-            </p>
-            <p className="mt-3 text-[12px] text-muted">{font.name}</p>
-          </FontCard>
+            <span className={cn("truncate px-1 text-[20px] leading-none", FONT_CLASS[font.id])}>
+              {glyph}
+            </span>
+          </button>
         ))}
         {visible.length === 0 ? (
-          <p className="py-6 text-center text-[13px] text-muted">No styles match that search.</p>
+          <p className="col-span-3 py-4 text-center text-[12px] text-muted">No models</p>
         ) : null}
       </div>
     </div>

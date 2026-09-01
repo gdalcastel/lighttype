@@ -37,6 +37,7 @@ export function LetterPreview({
   compact = false,
   loading = false,
   error = null,
+  className,
 }: {
   data: PreviewData | null;
   depthMm: number;
@@ -50,9 +51,10 @@ export function LetterPreview({
   compact?: boolean;
   loading?: boolean;
   error?: { message: string; suggestion?: string } | null;
+  className?: string;
 }) {
   return (
-    <div className="relative flex h-full min-h-[320px] flex-col overflow-hidden rounded-[24px] bg-[#f7f3ee]">
+    <div className={cn("relative flex h-full min-h-0 flex-col overflow-hidden bg-[#f7f3ee]", className)}>
       <div className="absolute inset-0">
         {data && data.letters.length > 0 ? (
           <LetterScene
@@ -75,12 +77,7 @@ export function LetterPreview({
               </div>
             ) : loading ? (
               <PreviewSkeleton />
-            ) : (
-              <div>
-                <p className="text-[18px] font-medium tracking-tight">Type something to see your letters.</p>
-                <p className="mt-2 text-[14px] text-muted">The 3D preview updates as you type.</p>
-              </div>
-            )}
+            ) : null}
           </div>
         )}
         {loading ? (
@@ -123,9 +120,9 @@ export function LetterPreview({
           <div className="pointer-events-auto flex flex-wrap items-center justify-center gap-1 rounded-full border border-border bg-white/90 p-1 shadow-[0_8px_24px_rgba(34,34,34,0.06)] backdrop-blur">
             {(
               [
-                ["showInterior", "Show interior", showInterior],
-                ["showLed", "Show LED", showLed],
-                ["showBar", "Show mounting bar", showBar],
+                ["showInterior", "Interior", showInterior],
+                ["showLed", "LED", showLed],
+                ["showBar", "Bar", showBar],
               ] as const
             ).map(([key, label, value]) => (
               <button

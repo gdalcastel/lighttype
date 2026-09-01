@@ -5,14 +5,14 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "LightType — Type it. Light it. Print it.",
-  description: "Create illuminated 3D letters ready for printing.",
+  title: "LightType",
+  description: "Illuminated 3D letters, ready to print.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${inter.variable} h-full antialiased`}>
-      <body className="min-h-full bg-background font-sans text-foreground">
+    <html lang="en" className={`${inter.variable} h-full overflow-hidden antialiased`}>
+      <body className="h-full overflow-hidden bg-background font-sans text-foreground">
         <TooltipProvider>
           {children}
           <Toaster position="bottom-center" richColors={false} />

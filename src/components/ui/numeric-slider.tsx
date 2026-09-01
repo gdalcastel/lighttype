@@ -11,6 +11,7 @@ type Props = {
   unit?: string;
   onChange: (value: number) => void;
   hint?: string;
+  compact?: boolean;
 };
 
 export function NumericSlider({
@@ -22,11 +23,14 @@ export function NumericSlider({
   unit = "mm",
   onChange,
   hint,
+  compact = false,
 }: Props) {
   return (
-    <div className="space-y-2.5">
+    <div className={compact ? "space-y-1.5" : "space-y-2.5"}>
       <div className="flex items-baseline justify-between gap-3">
-        <label className="text-[13px] font-medium text-foreground">{label}</label>
+        <label className={compact ? "text-[12px] font-medium text-foreground" : "text-[13px] font-medium text-foreground"}>
+          {label}
+        </label>
         <div className="flex items-center gap-1.5 text-muted">
           <input
             type="number"
@@ -39,10 +43,14 @@ export function NumericSlider({
               if (Number.isNaN(next)) return;
               onChange(Math.min(max, Math.max(min, next)));
             }}
-            className="h-8 w-16 rounded-lg border border-border bg-surface px-2 text-right text-[13px] text-foreground focus:border-foreground/30 focus:outline-none"
+            className={
+              compact
+                ? "h-7 w-14 rounded-md border border-border bg-surface px-1.5 text-right text-[12px] text-foreground focus:border-foreground/30 focus:outline-none"
+                : "h-8 w-16 rounded-lg border border-border bg-surface px-2 text-right text-[13px] text-foreground focus:border-foreground/30 focus:outline-none"
+            }
             aria-label={label}
           />
-          <span className="text-[12px]">{unit}</span>
+          <span className="text-[11px]">{unit}</span>
         </div>
       </div>
       <Slider
