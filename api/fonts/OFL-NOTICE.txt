@@ -1,0 +1,4 @@
+Fonts in this folder are sourced from Google Fonts and are licensed under
+the SIL Open Font License, Version 1.1.
+
+https://scripts.sil.org/OFL

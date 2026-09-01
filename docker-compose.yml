@@ -1,0 +1,29 @@
+name: lighttype
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: api
+    ports:
+      - "8765:8765"
+    restart: unless-stopped
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: web
+      args:
+        API_URL: http://api:8765
+    ports:
+      - "43127:43127"
+    environment:
+      API_URL: http://api:8765
+      PORT: "43127"
+      HOSTNAME: 0.0.0.0
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
