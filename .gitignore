@@ -1,8 +1,6 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
 # dependencies
-/node_modules
-/.pnp
+app/node_modules/
+**/.pnp
 .pnp.*
 .yarn/*
 !.yarn/patches
@@ -11,18 +9,29 @@
 !.yarn/versions
 
 # testing
-/coverage
+coverage/
 
 # next.js
-/.next/
-/out/
+app/.next/
+app/out/
+
+# capacitor / native
+app/android/.gradle/
+app/android/app/build/
+app/android/build/
+app/android/local.properties
+app/android/captures/
+app/ios/App/Pods/
+app/ios/App/build/
+app/ios/DerivedData/
 
 # production
-/build
+build/
 
 # misc
 .DS_Store
 *.pem
+lighttype-source.zip
 
 # debug
 npm-debug.log*
@@ -36,20 +45,23 @@ yarn-error.log*
 .env.development.local
 .env.test.local
 .env.production.local
+app/.env
+app/.env.local
 
 # vercel
 .vercel
 
 # typescript
 *.tsbuildinfo
-next-env.d.ts
+app/next-env.d.ts
 
 # python
 __pycache__/
 *.py[cod]
 .venv/
-.pytest_cache/
 api/.venv/
+.pytest_cache/
 
 # generated jobs
 /tmp/
+tmp/

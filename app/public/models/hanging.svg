@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 400" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#eef2f6"/>
+      <stop offset="100%" stop-color="#d9e0e8"/>
+    </linearGradient>
+    <linearGradient id="body" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#d8d4ce"/>
+      <stop offset="100%" stop-color="#b8b4ae"/>
+    </linearGradient>
+    <linearGradient id="face" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#9ee0ff"/>
+      <stop offset="100%" stop-color="#6ec4ef"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="400" fill="url(#bg)"/>
+  <line x1="200" y1="28" x2="280" y2="88" stroke="#7a8490" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="440" y1="28" x2="360" y2="88" stroke="#7a8490" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="160" y1="28" x2="480" y2="28" stroke="#9aa3ad" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="280" cy="92" r="8" fill="none" stroke="#7a8490" stroke-width="2.5"/>
+  <circle cx="360" cy="92" r="8" fill="none" stroke="#7a8490" stroke-width="2.5"/>
+  <g transform="translate(230 95)">
+    <path d="M28 220 L72 20 H108 L152 220 H112 L104 180 H76 L68 220 Z M84 148 H96 L90 110 Z" fill="url(#body)"/>
+    <path d="M40 210 L78 28 H102 L140 210 H118 L108 168 H74 L64 210 Z M86 138 H96 L91 108 Z" fill="url(#face)" opacity="0.92"/>
+    <circle cx="54" cy="18" r="6" fill="#8a9098"/>
+    <circle cx="126" cy="18" r="6" fill="#8a9098"/>
+  </g>
+  <text x="320" y="372" text-anchor="middle" font-family="system-ui,sans-serif" font-size="13" fill="#6a7380" letter-spacing="0.08em">SUSPENSO</text>
+</svg>

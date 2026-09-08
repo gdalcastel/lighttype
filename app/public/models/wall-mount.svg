@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 400" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f0ebe4"/>
+      <stop offset="100%" stop-color="#ddd5cb"/>
+    </linearGradient>
+    <linearGradient id="wall" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#e8e2d9"/>
+      <stop offset="100%" stop-color="#cfc6ba"/>
+    </linearGradient>
+    <linearGradient id="body" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#d8d4ce"/>
+      <stop offset="100%" stop-color="#b8b4ae"/>
+    </linearGradient>
+    <linearGradient id="face" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#9ee0ff"/>
+      <stop offset="100%" stop-color="#6ec4ef"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="400" fill="url(#bg)"/>
+  <rect x="120" y="40" width="400" height="300" rx="4" fill="url(#wall)"/>
+  <path d="M140 60 H500 V320 H140 Z" stroke="#b8aea2" stroke-width="1" opacity="0.5"/>
+  <ellipse cx="320" cy="280" rx="90" ry="40" fill="#000" opacity="0.05"/>
+  <g transform="translate(230 70)">
+    <path d="M28 220 L72 20 H108 L152 220 H112 L104 180 H76 L68 220 Z M84 148 H96 L90 110 Z" fill="url(#body)"/>
+    <path d="M40 210 L78 28 H102 L140 210 H118 L108 168 H74 L64 210 Z M86 138 H96 L91 108 Z" fill="url(#face)" opacity="0.92"/>
+    <circle cx="54" cy="90" r="7" fill="#8a847c" stroke="#f4f0ea" stroke-width="2"/>
+    <circle cx="126" cy="90" r="7" fill="#8a847c" stroke="#f4f0ea" stroke-width="2"/>
+    <circle cx="54" cy="170" r="7" fill="#8a847c" stroke="#f4f0ea" stroke-width="2"/>
+    <circle cx="126" cy="170" r="7" fill="#8a847c" stroke="#f4f0ea" stroke-width="2"/>
+  </g>
+  <text x="320" y="372" text-anchor="middle" font-family="system-ui,sans-serif" font-size="13" fill="#8a847c" letter-spacing="0.08em">PAREDE - FUROS</text>
+</svg>

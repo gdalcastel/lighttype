@@ -31,24 +31,24 @@ def friendly_from_exception(exc: Exception, letter: str | None = None) -> Geomet
     text = str(exc).lower()
     if "buffer" in text or "empty" in text or "offset" in text:
         return GeometryError(
-            "We couldn't hollow this letter at the current size.",
-            suggestion="Try increasing the letter height or reducing the wall thickness.",
+            "Não foi possível ocar esta letra no tamanho atual.",
+            suggestion="Aumente a altura da letra ou reduza a espessura da parede.",
             letter=letter,
         )
     if "boolean" in text or "manifold" in text or "topology" in text or "union" in text:
         return GeometryError(
-            "We couldn't create this letter at the current size.",
-            suggestion="Try a simpler font, a larger height, or a thinner wall.",
+            "Não foi possível criar esta letra no tamanho atual.",
+            suggestion="Tente uma fonte mais simples, maior altura ou parede mais fina.",
             letter=letter,
         )
     if "triangul" in text or "earcut" in text or "extrude" in text:
         return GeometryError(
-            "This letter's outline is too detailed to turn into a solid at the current size.",
-            suggestion="Try increasing the letter height or choosing another font.",
+            "O contorno desta letra é complexo demais para o tamanho atual.",
+            suggestion="Aumente a altura da letra ou escolha outra fonte.",
             letter=letter,
         )
     return GeometryError(
-        "We couldn't create this letter at the current size.",
-        suggestion="Try increasing the letter height or reducing the wall thickness.",
+        "Não foi possível criar esta letra no tamanho atual.",
+        suggestion="Aumente a altura da letra ou reduza a espessura da parede.",
         letter=letter,
     )

@@ -9,7 +9,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from engine.errors import GeometryError, friendly_from_exception
-from engine.generate import generate_parts, params_from_request, project_slug, write_zip_bytes
+from engine.generate import generate_parts, params_from_request, write_export_bytes
 
 JOB_DIR = Path("/tmp/lighttype-jobs")
 JOB_DIR.mkdir(parents=True, exist_ok=True)
@@ -75,11 +75,27 @@ def run_job(job_id: str):
         params = params_from_request(payload)
         text = payload["text"]
         font_id = payload["font_id"]
-        parts = generate_parts(text, font_id, params, on_stage=on_stage)
-        zip_bytes = write_zip_bytes(text, font_id, params, parts)
-        zip_name = f"{project_slug(text)}.zip"
-        zip_path = JOB_DIR / f"{job.id}-{zip_name}"
-        zip_path.write_bytes(zip_bytes)
+        parts, shadow_mesh, accessories = generate_parts(
+            text,
+            font_id,
+            params,
+            on_stage=on_stage,
+            input_mode=payload.get("input_mode", "text"),
+            svg_content=payload.get("svg_content"),
+            letter_indices=payload.get("letter_indices"),
+        )
+        export_format = str(payload.get("export_format") or "stl")
+        file_bytes, download_name, files = write_export_bytes(
+            text,
+            font_id,
+            params,
+            parts,
+            shadow_mesh,
+            accessories,
+            export_format=export_format,
+        )
+        zip_path = JOB_DIR / f"{job.id}-{download_name}"
+        zip_path.write_bytes(file_bytes)
         _update(
             job,
             status="completed",
@@ -90,9 +106,10 @@ def run_job(job_id: str):
             result={
                 "text": text,
                 "letter_count": len(parts),
-                "part_count": len(parts) * 2,
-                "zip_name": zip_name,
-                "files": [p["body_name"] for p in parts] + [p["front_name"] for p in parts] + ["README.txt"],
+                "part_count": len(parts) * 2 + len(accessories) + (1 if shadow_mesh is not None else 0),
+                "zip_name": download_name,
+                "export_format": "3mf" if download_name.endswith(".3mf") else "stl",
+                "files": files,
             },
         )
     except GeometryError as exc:

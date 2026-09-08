@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 400" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f3efe8"/>
+      <stop offset="100%" stop-color="#e4dbd0"/>
+    </linearGradient>
+    <linearGradient id="body" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#d8d4ce"/>
+      <stop offset="100%" stop-color="#b8b4ae"/>
+    </linearGradient>
+    <linearGradient id="face" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#9ee0ff"/>
+      <stop offset="100%" stop-color="#6ec4ef"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="400" fill="url(#bg)"/>
+  <g transform="translate(120 70)">
+    <rect x="8" y="210" width="118" height="26" rx="3" fill="#b8b2aa"/>
+    <path d="M126 216 h10 v14 h-10" stroke="#9a948c" stroke-width="3" fill="none"/>
+    <path d="M18 200 L52 30 H82 L116 200 H88 L82 165 H52 L46 200 Z M60 135 H74 L67 100 Z" fill="url(#body)"/>
+    <path d="M28 190 L58 38 H76 L106 190 H90 L82 155 H52 L44 190 Z M62 125 H72 L67 98 Z" fill="url(#face)" opacity="0.92"/>
+  </g>
+  <g transform="translate(300 70)">
+    <rect x="18" y="210" width="118" height="26" rx="3" fill="#b8b2aa"/>
+    <path d="M8 216 h10 v14 h-10" fill="#9a948c"/>
+    <path d="M28 200 L62 30 H92 L126 200 H98 L92 165 H62 L56 200 Z M70 135 H84 L77 100 Z" fill="url(#body)"/>
+    <path d="M38 190 L68 38 H86 L116 190 H100 L92 155 H62 L54 190 Z M72 125 H82 L77 98 Z" fill="url(#face)" opacity="0.92"/>
+  </g>
+  <text x="320" y="372" text-anchor="middle" font-family="system-ui,sans-serif" font-size="13" fill="#8a847c" letter-spacing="0.08em">FILEIRA SNAP</text>
+</svg>

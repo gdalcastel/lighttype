@@ -3,18 +3,23 @@ name: lighttype
 services:
   api:
     build:
-      context: .
+      context: ./api
       dockerfile: Dockerfile
-      target: api
     ports:
       - "8765:8765"
+    environment:
+      BAMBU_CONNECT_EXPORT_DIR: /exports
+      # Absolute path on the host machine (must match the bind mount below).
+      # Example: BAMBU_CONNECT_HOST_PATH=/Users/you/btbw/lighttype/data/bambu-export
+      BAMBU_CONNECT_HOST_PATH: ${BAMBU_CONNECT_HOST_PATH:-}
+    volumes:
+      - ${BAMBU_CONNECT_HOST_PATH:-./data/bambu-export}:/exports
     restart: unless-stopped
 
   web:
     build:
-      context: .
+      context: ./app
       dockerfile: Dockerfile
-      target: web
       args:
         API_URL: http://api:8765
     ports:

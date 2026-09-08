@@ -124,7 +124,39 @@ def _dedupe_ring(pts: list[Point], eps: float = 1e-4) -> list[Point]:
 
 
 @lru_cache(maxsize=32)
+def _font_cmap_for_id(font_id: str) -> dict[int, str]:
+    """Cached cmap lookup — safe to share across threads."""
+    spec = get_font(font_id)
+    if not spec.path.exists():
+        raise GeometryError(
+            "This style isn’t available right now.",
+            suggestion="Choose another font and try again.",
+        )
+    with TTFont(str(spec.path)) as font:
+        return font.getBestCmap() or {}
+
+
+@lru_cache(maxsize=32)
+def _font_cap_height_for_id(font_id: str) -> float:
+    spec = get_font(font_id)
+    with TTFont(str(spec.path)) as font:
+        os2 = font["OS/2"]
+        cap = float(getattr(os2, "sCapHeight", 0) or 0)
+        if cap > 0:
+            return cap
+        hhea = font["hhea"]
+        return max(float(hhea.ascent) * 0.72, 1.0)
+
+
+@lru_cache(maxsize=32)
+def _font_units_per_em_for_id(font_id: str) -> float:
+    spec = get_font(font_id)
+    with TTFont(str(spec.path)) as font:
+        return float(font["head"].unitsPerEm)
+
+
 def load_font(font_id: str) -> TTFont:
+    """Open a fresh font handle per call — fontTools TTFont is not thread-safe."""
     spec = get_font(font_id)
     if not spec.path.exists():
         raise GeometryError(
@@ -135,8 +167,7 @@ def load_font(font_id: str) -> TTFont:
 
 
 def font_cmap(font: TTFont) -> dict[int, str]:
-    cmap = font.getBestCmap() or {}
-    return cmap
+    return font.getBestCmap() or {}
 
 
 def cap_height(font: TTFont) -> float:
@@ -153,25 +184,23 @@ def units_per_em(font: TTFont) -> float:
     return float(font["head"].unitsPerEm)
 
 
-def scale_for_height(font: TTFont, height_mm: float) -> float:
-    return height_mm / cap_height(font)
+def scale_for_height(font_id: str, height_mm: float) -> float:
+    return height_mm / _font_cap_height_for_id(font_id)
 
 
-def supported_codepoint(font: TTFont, char: str) -> bool:
+def supported_codepoint(font_id: str, char: str) -> bool:
     if char == " ":
         return True
-    cmap = font_cmap(font)
-    return ord(char) in cmap
+    return ord(char) in _font_cmap_for_id(font_id)
 
 
 def unsupported_characters(font_id: str, text: str) -> list[str]:
-    font = load_font(font_id)
     found: list[str] = []
     seen: set[str] = set()
     for ch in text:
         if ch in seen or ch == "\n" or ch == "\r" or ch == "\t":
             continue
-        if not supported_codepoint(font, ch):
+        if not supported_codepoint(font_id, ch):
             found.append(ch)
             seen.add(ch)
     return found
@@ -209,6 +238,24 @@ def _as_polygons(geom) -> list:
         geom = make_valid(geom)
     geom = geom.buffer(0)
     return [p for p in iter_polygons(geom) if p.area > 1e-8]
+
+
+def _filter_tiny_holes(poly: Polygon, min_ratio: float = 0.08) -> Polygon:
+    """Drop spurious micro-loops from font outlines (common on R, B, P, etc.)."""
+    if not poly.interiors:
+        return poly
+    hole_areas = [Polygon(interior).area for interior in poly.interiors]
+    max_area = max(hole_areas)
+    if max_area <= 0:
+        return poly
+    keep = [
+        interior
+        for interior, area in zip(poly.interiors, hole_areas, strict=True)
+        if area >= max_area * min_ratio
+    ]
+    if len(keep) == len(poly.interiors):
+        return poly
+    return Polygon(poly.exterior.coords, keep)
 
 
 def _contains(outer, inner) -> bool:
@@ -283,6 +330,7 @@ def contours_to_geometry(contours: list[list[Point]]):
             built = Polygon(list(poly.exterior.coords), hole_rings)
         except Exception:
             built = poly
+        built = _filter_tiny_holes(built)
         fills.extend(_as_polygons(built))
 
     if not fills:
@@ -292,8 +340,8 @@ def contours_to_geometry(contours: list[list[Point]]):
     return clean_polygon(unary_union(fills))
 
 
-def glyph_geometry(font: TTFont, char: str):
-    cmap = font_cmap(font)
+def glyph_geometry(font_id: str, char: str):
+    cmap = _font_cmap_for_id(font_id)
     code = ord(char)
     if code not in cmap:
         raise UnsupportedCharacterError(
@@ -302,6 +350,7 @@ def glyph_geometry(font: TTFont, char: str):
             letter=char,
         )
     name = cmap[code]
+    font = load_font(font_id)
     glyph_set = font.getGlyphSet()
     if name not in glyph_set:
         raise UnsupportedCharacterError(
@@ -309,7 +358,7 @@ def glyph_geometry(font: TTFont, char: str):
             suggestion="Remove this character or choose another font.",
             letter=char,
         )
-    upm = units_per_em(font)
+    upm = _font_units_per_em_for_id(font_id)
     tolerance = max(0.6, upm / 1400.0)
     pen = FlatteningPen(glyph_set, tolerance=tolerance)
     glyph_set[name].draw(pen)
@@ -339,9 +388,16 @@ class LaidOutGlyph:
     index: int
     geometry: object
     bounds: tuple[float, float, float, float]
+    glyph_bounds: tuple[float, float, float, float]
     x: float
     width: float
     height: float
+    letter_geometry: object | None = None
+
+    @property
+    def cavity_source(self):
+        """Letter body without the connection base — used to avoid hollowing the base strip."""
+        return self.letter_geometry if self.letter_geometry is not None else self.geometry
 
 
 def layout_text(
@@ -349,45 +405,71 @@ def layout_text(
     text: str,
     height_mm: float,
     spacing_mm: float,
+    *,
+    base_params=None,
+    line_spacing_mm: float | None = None,
 ) -> list[LaidOutGlyph]:
-    font = load_font(font_id)
-    unsupported = unsupported_characters(font_id, text)
+    normalized = text.replace("\r\n", "\n").replace("\r", "\n")
+    unsupported = unsupported_characters(font_id, normalized)
     if unsupported:
         shown = " ".join(unsupported[:8])
         raise UnsupportedCharacterError(
             f"This font doesn’t include: {shown}",
             suggestion="Remove those characters or pick another style.",
         )
-    scale = scale_for_height(font, height_mm)
+    scale = scale_for_height(font_id, height_mm)
     space_width = height_mm * 0.32
+    line_gap = line_spacing_mm if line_spacing_mm is not None else max(2.0, height_mm * 0.2)
+    line_step = height_mm + line_gap
     x = 0.0
+    line_index = 0
     letters: list[LaidOutGlyph] = []
     printable_index = 0
-    for ch in text:
+    for ch in normalized:
         if ch == " ":
             x += space_width
             continue
-        if ch in "\n\r\t":
+        if ch == "\n":
+            x = 0.0
+            line_index += 1
             continue
-        geom = glyph_geometry(font, ch)
+        if ch == "\t":
+            x += space_width * 4
+            continue
+        geom = glyph_geometry(font_id, ch)
         geom = shp_scale(geom, xfact=scale, yfact=scale, origin=(0, 0))
         minx, miny, maxx, maxy = geom.bounds
-        geom = shp_translate(geom, xoff=x - minx, yoff=0.0)
+        y_base = -line_index * line_step
+        geom = shp_translate(geom, xoff=x - minx, yoff=y_base - miny)
         minx, miny, maxx, maxy = geom.bounds
+        glyph_bounds = (minx, miny, maxx, maxy)
         width = maxx - minx
+        letter_geom = geom
+
+        if base_params is not None and getattr(base_params, "enabled", False):
+            from dataclasses import replace
+
+            from engine.connection_base import add_connection_base
+
+            effective_base = replace(base_params, spacing_mm=spacing_mm)
+            geom = add_connection_base(geom, effective_base, glyph_bounds=glyph_bounds)
+
+        full_bounds = geom.bounds
         letters.append(
             LaidOutGlyph(
                 char=ch,
                 index=printable_index,
                 geometry=geom,
-                bounds=(minx, miny, maxx, maxy),
+                bounds=full_bounds,
+                glyph_bounds=glyph_bounds,
                 x=minx,
                 width=width,
-                height=maxy - miny,
+                height=glyph_bounds[3] - glyph_bounds[1],
+                letter_geometry=letter_geom if letter_geom is not geom else None,
             )
         )
         printable_index += 1
-        x = maxx + spacing_mm
+        x = glyph_bounds[2] + spacing_mm
     if not letters:
         raise GeometryError(
             "Type a name, word or phrase to get started.",

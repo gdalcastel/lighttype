@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 400" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#eceff3"/>
+      <stop offset="100%" stop-color="#d5dbe3"/>
+    </linearGradient>
+    <linearGradient id="body" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#d8d4ce"/>
+      <stop offset="100%" stop-color="#b8b4ae"/>
+    </linearGradient>
+    <linearGradient id="face" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#9ee0ff"/>
+      <stop offset="100%" stop-color="#6ec4ef"/>
+    </linearGradient>
+    <linearGradient id="bar" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#3a3f46"/>
+      <stop offset="50%" stop-color="#5a616a"/>
+      <stop offset="100%" stop-color="#3a3f46"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="400" fill="url(#bg)"/>
+  <rect x="80" y="292" width="480" height="28" rx="6" fill="url(#bar)"/>
+  <rect x="96" y="300" width="36" height="12" rx="2" fill="#c45c4a" opacity="0.85"/>
+  <rect x="160" y="300" width="36" height="12" rx="2" fill="#2a2e34"/>
+  <rect x="224" y="300" width="36" height="12" rx="2" fill="#2a2e34"/>
+  <rect x="380" y="300" width="36" height="12" rx="2" fill="#2a2e34"/>
+  <rect x="444" y="300" width="36" height="12" rx="2" fill="#2a2e34"/>
+  <rect x="508" y="300" width="36" height="12" rx="2" fill="#2a2e34"/>
+  <g transform="translate(230 55)">
+    <path d="M28 220 L72 20 H108 L152 220 H112 L104 180 H76 L68 220 Z M84 148 H96 L90 110 Z" fill="url(#body)"/>
+    <path d="M40 210 L78 28 H102 L140 210 H118 L108 168 H74 L64 210 Z M86 138 H96 L91 108 Z" fill="url(#face)" opacity="0.92"/>
+    <rect x="82" y="218" width="16" height="22" rx="3" fill="#6a7078"/>
+    <circle cx="90" cy="248" r="5" fill="#c45c4a"/>
+  </g>
+  <text x="320" y="372" text-anchor="middle" font-family="system-ui,sans-serif" font-size="13" fill="#6a7380" letter-spacing="0.08em">BARRA ELETRIFICADA</text>
+</svg>
